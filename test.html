@@ -1,94 +1,142 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using Microsoft.Phone.Controls;
+using Microsoft.Phone.Shell;
 
-GitHub GitHub
+namespace PhotoEffectDemo
+{
+    public partial class App : Application
+    {
+        /// <summary>
+        /// Phone アプリケーションのルート フレームへの容易なアクセスを提供します。
+        /// </summary>
+        /// <returns>Phone アプリケーションのルート フレームです。</returns>
+        public PhoneApplicationFrame RootFrame { get; private set; }
 
-    Explore
-    Gist
-    Blog
-    Help
+        /// <summary>
+        /// Application オブジェクトのコンストラクターです。
+        /// </summary>
+        public App()
+        {
+            // キャッチできない例外のグローバル ハンドラーです。 
+            UnhandledException += Application_UnhandledException;
 
-ktsutsu
+            // Silverlight の標準初期化
+            InitializeComponent();
 
-    News Feed
-    News Feed
-    News Feed
-    News Feed
+            // Phone 固有の初期化
+            InitializePhoneApplication();
 
-    News Feed
-    Your Actions
-    Pull Requests
-    Issues
-    Stars
+            // デバッグ中にグラフィックスのプロファイル情報を表示します。
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                // 現在のフレーム レート カウンターを表示します。
+                Application.Current.Host.Settings.EnableFrameRateCounter = true;
 
-GitHub Bootcamp If you are still new to things, we’ve provided a few walkthroughs to get you started.
+                // 各フレームで再描画されているアプリケーションの領域を表示します。
+                //Application.Current.Host.Settings.EnableRedrawRegions = true;
 
-    Set Up Git
+                // 試験的な分析視覚化モードを有効にします。 
+                // これにより、色付きのオーバーレイを使用して、GPU に渡されるページの領域が表示されます。
+                //Application.Current.Host.Settings.EnableCacheVisualization = true;
 
-    A quick guide to help you get started with Git.
-    Create A Repository
+                // アプリケーションの PhoneApplicationService オブジェクトの UserIdleDetectionMode プロパティを Disabled に設定して、
+                // アプリケーションのアイドル状態の検出を無効にします。
+                // 注意: これはデバッグ モードのみで使用してください。ユーザーが電話を使用していないときに、ユーザーのアイドル状態の検出を無効にする
+                // アプリケーションが引き続き実行され、バッテリ電源が消耗します。
+                PhoneApplicationService.Current.UserIdleDetectionMode = IdleDetectionMode.Disabled;
+            }
 
-    Create the place where your commits will be stored.
-    Fork a Repository
+        }
 
-    Copy a repo to create a new, unique project from its contents.
-    Be social
+        // (たとえば、[スタート] メニューから) アプリケーションが起動するときに実行されるコード
+        // このコードは、アプリケーションが再アクティブ化済みの場合には実行されません
+        private void Application_Launching(object sender, LaunchingEventArgs e)
+        {
+        }
 
-    Follow a friend.
-    Watch a project.
+        // アプリケーションがアクティブになった (前面に表示された) ときに実行されるコード
+        // このコードは、アプリケーションの初回起動時には実行されません
+        private void Application_Activated(object sender, ActivatedEventArgs e)
+        {
+        }
 
-Welcome to GitHub! What's next? (9 days ago)
+        // アプリケーションが非アクティブになった (バックグラウンドに送信された) ときに実行されるコード
+        // このコードは、アプリケーションの終了時には実行されません
+        private void Application_Deactivated(object sender, DeactivatedEventArgs e)
+        {
+        }
 
-    Create a Repository
-    Tell us about yourself
-    Browse Interesting Repos
-    Follow @github on Twitter
+        // (たとえば、ユーザーが戻るボタンを押して) アプリケーションが終了するときに実行されるコード
+        // このコードは、アプリケーションが非アクティブになっているときには実行されません
+        private void Application_Closing(object sender, ClosingEventArgs e)
+        {
+        }
 
-Your Repositories (3)
-New repository
+        // ナビゲーションに失敗した場合に実行されるコード
+        private void RootFrame_NavigationFailed(object sender, NavigationFailedEventArgs e)
+        {
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                // ナビゲーションに失敗しました。デバッガーで中断します。
+                System.Diagnostics.Debugger.Break();
+            }
+        }
 
-    All Repositories
-    Forks
-    Sources
-    Private
-    Public
+        // ハンドルされない例外の発生時に実行されるコード
+        private void Application_UnhandledException(object sender, ApplicationUnhandledExceptionEventArgs e)
+        {
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                // ハンドルされない例外が発生しました。デバッガーで中断します。
+                System.Diagnostics.Debugger.Break();
+            }
+        }
 
-    ktsutsu/PhotoEffectDemo
-    ktsutsu/ISBN9784798031996
-    ktsutsu/test1
+        #region Phone アプリケーションの初期化
 
-GitHub Links
+        // 初期化の重複を回避します
+        private bool phoneApplicationInitialized = false;
 
-    GitHub
-    About
-    Blog
-    Features
-    Contact & Support
-    Training
-    GitHub Enterprise
-    Site Status
+        // このメソッドに新たなコードを追加しないでください
+        private void InitializePhoneApplication()
+        {
+            if (phoneApplicationInitialized)
+                return;
 
-    Clients
-    GitHub for Mac
-    GitHub for Windows
-    GitHub for Eclipse
-    GitHub Mobile Apps
+            // フレームを作成しますが、まだ RootVisual に設定しないでください。これによって、アプリケーションがレンダリングできる状態になるまで、
+            // スプラッシュ スクリーンをアクティブなままにすることができます。
+            RootFrame = new PhoneApplicationFrame();
+            RootFrame.Navigated += CompleteInitializePhoneApplication;
 
-    Tools
-    Gauges: Web analytics
-    Speaker Deck: Presentations
-    Gist: Code snippets
-    Extras
-    Job Board
-    GitHub Shop
-    The Octodex
+            // ナビゲーション エラーを処理します
+            RootFrame.NavigationFailed += RootFrame_NavigationFailed;
 
-    Documentation
-    GitHub Help
-    Developer API
-    GitHub Flavored Markdown
-    GitHub Pages
+            // 再初期化しないようにします
+            phoneApplicationInitialized = true;
+        }
 
-    Terms of Service
-    Privacy
-    Security
+        // このメソッドに新たなコードを追加しないでください
+        private void CompleteInitializePhoneApplication(object sender, NavigationEventArgs e)
+        {
+            // ルート visual を設定してアプリケーションをレンダリングできるようにします
+            if (RootVisual != RootFrame)
+                RootVisual = RootFrame;
 
-© 2012 GitHub Inc. All rights reserved.
+            // このハンドラーは必要なくなったため、削除します
+            RootFrame.Navigated -= CompleteInitializePhoneApplication;
+        }
+
+        #endregion
+    }
+}
