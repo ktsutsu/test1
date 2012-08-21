@@ -20,4 +20,15 @@
 *.PDF	 diff=astextplain
 *.rtf	 diff=astextplain
 *.RTF	 diff=astextplain
-*.html  eol=lf filter=normalize-text
+
+# for windows
+*.txt    eol=lf
+*.html   eol=lf
+*.xml    eol=lf
+*.php    eol=lf
+*.css    eol=lf
+*.js     eol=lf
+*.java   eol=lf
+*.cs     eol=lf diff=csharp
+*.csproj eol=lf
+*.xaml   eol=lf
